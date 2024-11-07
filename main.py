@@ -1,6 +1,7 @@
 from nba_api.stats.endpoints import playergamelog
 from nba_api.stats.static import players
 import pandas as pd
+import time
 
 def get_player_id(player_name):
     # Search for player ID based on the player's name
@@ -17,7 +18,7 @@ def get_last_5_games_stats(player_name):
         return
 
     # Get the game log for the player
-    gamelog = playergamelog.PlayerGameLog(player_id=player_id, season='2023')
+    gamelog = playergamelog.PlayerGameLog(player_id=player_id, season='2024')
     games_df = gamelog.get_data_frames()[0]  # Get data as a DataFrame
 
     # Filter for only the last 5 games and create a full copy
@@ -43,12 +44,11 @@ def get_last_5_games_stats(player_name):
         consistency = "Poor"
 
     # Display last 5 game stats with combined PRA, variance, and standard deviation
-    print(f"Last 5 games stats for {player_name}:")
-    print(last_5_stats[['Date', 'Points', 'Rebounds', 'Assists', 'PRA']])
-    print("\nVariance and Standard Deviation of PRA:")
-    print(f"PRA - Variance: {variance_pra:.2f}, Standard Deviation: {std_dev_pra:.2f}")
-    print(f"Consistency: {consistency}")
+    print(f"{player_name}: {std_dev_pra:.2f} ({consistency})")
 
-# Prompt the user for a player's name
-player_name = input("Enter the player's full name: ")
-get_last_5_games_stats(player_name)
+with open("players.txt", "r") as file:
+    player_names = [line.strip() for line in file.readlines()]
+
+for player_name in player_names:
+    get_last_5_games_stats(player_name)
+    time.sleep(3)
